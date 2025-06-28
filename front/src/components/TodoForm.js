@@ -1,29 +1,31 @@
 import React, { useState } from 'react';
-import api from '../api';
 
 function TodoForm({ onTodoAdded }) {
   const [title, setTitle] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      await api.post('/', { title });
-      setTitle('');
-      onTodoAdded();
-    } catch (err) {
-      console.error('Submit error:', err);
-    }
+    if (!title) return;
+    await fetch('http://localhost:5000/api/todos', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title, completed: false })
+    });
+    setTitle('');
+    onTodoAdded();
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="mb-3 d-flex">
       <input
-        placeholder="Add a task"
+        type="text"
+        className="form-control me-2"
         value={title}
-        onChange={e => setTitle(e.target.value)}
+        onChange={(e) => setTitle(e.target.value)}
+        placeholder="Enter todo"
         required
       />
-      <button type="submit">Add</button>
+      <button className="btn btn-primary" type="submit">Add Todo</button>
     </form>
   );
 }
